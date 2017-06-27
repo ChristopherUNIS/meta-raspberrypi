@@ -6,10 +6,6 @@ SECTION = "kernel"
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d7810fab7487fb0aad327b76f1be7cd7"
 
-SRC_URI += " \
-        file://defconfig \
-        "
-
 COMPATIBLE_MACHINE = "raspberrypi"
 
 PE = "1"
@@ -19,6 +15,8 @@ PV = "${LINUX_VERSION}+git${SRCPV}"
 KERNEL_DEFCONFIG_raspberrypi ?= "bcmrpi_defconfig"
 KERNEL_DEFCONFIG_raspberrypi2 ?= "bcm2709_defconfig"
 KERNEL_DEFCONFIG_raspberrypi3-64 ?= "bcmrpi3_defconfig"
+KMACHINE ?= "${MACHINE}"
+KCONFIG_MODE = "--alldefconfig"
 
 # CMDLINE for raspberrypi
 CMDLINE ?= "dwc_otg.lpm_enable=0 console=serial0,115200 root=/dev/mmcblk0p2 rootfstype=ext4 rootwait"
@@ -36,14 +34,6 @@ python __anonymous () {
     kerneltype = d.getVar('KERNEL_IMAGETYPE')
     kerneldt = get_dts(d, d.getVar('LINUX_VERSION'))
     d.setVar("KERNEL_DEVICETREE", kerneldt)
-}
-
-do_kernel_configme_prepend() {
-    install -m 0644 ${S}/arch/${ARCH}/configs/${KERNEL_DEFCONFIG} ${WORKDIR}/defconfig || die "No default configuration for ${MACHINE} / ${KERNEL_DEFCONFIG} available."
-}
-
-do_install_prepend() {
-    install -d ${D}/lib/firmware
 }
 
 do_deploy_append() {
